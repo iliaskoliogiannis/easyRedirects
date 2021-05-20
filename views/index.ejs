@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Easy Redirects</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/united/bootstrap.min.css">
+</head>
+<style>
+    .dl{ 
+        border: solid 2px;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 30px;
+    }
+    .dl:hover{
+        text-decoration: none;
+    }
+</style>
+<body>
+<div class="container mt-5 pl-5 pr-5">
+    <div class="row">
+        <% if (redirects == null) { %>
+        <form method="POST" action="/" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="col-form-label col-form-label-lg" for="inputLarge">Fill in the Domain</label>
+                <input class="form-control form-control-lg" type="text" placeholder="paste the domain..." name="domain">
+            </div>
+            <div>
+                <label>Select your profile picture:</label>
+                <input type="file" name="excel-file" />
+            </div>
+            <div class="mt-5">
+                <input type="submit" name="btn_upload_profile_pic" value="Upload" />
+            </div>
+        </form>
+        <% } else { %>
+            <div class="row d-flex justify-content-center">
+                <div class="col-12">
+                    <h2>Download your redirects</h2>
+                </div>
+                <div class="col-12 mt-4">
+                    <a href="<%=redirects%>" download class="dl">
+                        download 
+                    </a>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+</body>
+</html>
