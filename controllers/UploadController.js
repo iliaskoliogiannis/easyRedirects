@@ -1,11 +1,11 @@
 const Multer = require("../services/multer");
 const excelToJson = require('convert-excel-to-json');
-const write = require('write');
+const fse = require('fs-extra');
 
 const index = (req, res) => {
+
     res.render("index", {
-        success: true,
-        redirects: null
+        success: true
     });
 }
 
@@ -15,8 +15,6 @@ const upload = (req, res, next) => {
 
     upload(req, res, (err) => {
         
-        let domain = req.body.domain;
-
         if (req.fileValidationError) {
             return res.send(req.fileValidationError);
         }
@@ -38,14 +36,18 @@ const upload = (req, res, next) => {
 
 const create = (req, res) => {
 
+
     let domain = req.body.domain;
+    let code = (req.body.code != "") ? req.body.code : "301";
     let name = req.file.filename;
+    let path = req.file.path;
 
     const result = excelToJson({
         sourceFile: 'input/' + name,
         columnToKey: {
             A: 'oldUrl',
-            B: 'newUrl'
+            B: 'newUrl',
+            C: "code"
         }
     });
 
@@ -55,23 +57,29 @@ const create = (req, res) => {
 
         let o = r.oldUrl.replace(domain, "");
         let n = r.newUrl.replace(domain, "");
+        let c = (r.code != undefined) ? r.code : code;
 
         if ( n == ""){ n = "/" }
 
-        htaccess += "RewriteCond %{REQUEST_URI} " + o + "\n" + 
-            "RewriteRule ^ " + n + " [R=301,L]" + "\n\n";
+        htaccess += `RewriteCond %{REQUEST_URI} ${o}\n` + 
+            `RewriteRule ^ ${n} [R=${c},L] \n\n`;
 
     }
 
-    write.sync("output/redirects.txt", htaccess, {
-        newline: true,
-        overwrite: true
-    });
+    fse.remove(path, err => {
+        if (err) {
+            return res.json({
+                success: false,
+                message: err.message
+            })
+        }
+    })
 
-    res.render("index", {
-        success: true,
-        redirects: "/output/redirects.txt"
+    res.set({
+        'Content-Type': 'application/force-download',
+        'Content-Disposition':'attachment; filename=redirects.txt'
     });
+    res.send(htaccess);
 
 }
 

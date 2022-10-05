@@ -9,6 +9,5 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
 
-app.use('/output', express.static('output'))
-
+app.use('/assets', express.static('assets'));
 app.use(require("./routes/routes"));
